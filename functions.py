@@ -41,3 +41,40 @@ def generate_sample(model, size, seed_string):
         index = predict_char(model, index)
         sample.append(index)
     return sample
+
+
+def train(model, optimizer, loss_fn, num_epochs, data, seq_length, verbose=False):
+    data_one_hot = make_one_hot(data, model.vocab_size)
+    dtype = torch.float
+    data_length = len(data)
+    seqs_per_epoch = int(data_length / seq_length)  # will this work if data/seq divides exactly?
+
+    data3d = np.expand_dims(data_one_hot, 1)
+    for epoch in range(num_epochs):
+        model.reset_states()
+
+        if epoch != 0:
+            print('epoch: {}, loss: {}'.format(epoch, loss))
+
+        for i in range(seqs_per_epoch):
+            start = i * seq_length
+            end = i * seq_length + seq_length
+            end = min(end, data_length - 1)
+
+            inputs_raw = data3d[start:end]
+            targets_raw = data[start + 1:end + 1]
+
+            # both inputs and targets are (seq_length, 1, vocab_size)
+            inputs = torch.tensor(inputs_raw, dtype=dtype)
+            targets = torch.tensor(targets_raw, dtype=torch.long)
+
+            out = model(inputs)
+
+            out2 = out.view((seq_length, model.vocab_size))
+            loss = loss_fn(out2, targets)
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            if verbose and i % 10 == 0:
+                print(i, loss.item())
