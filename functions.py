@@ -78,3 +78,9 @@ def train(model, optimizer, loss_fn, num_epochs, data, seq_length, verbose=False
             optimizer.step()
             if verbose and i % 10 == 0:
                 print(i, loss.item())
+
+
+def print_sample(model, seed_string, length, char_to_idx, idx_to_char):
+    sample = generate_sample(model, length, [char_to_idx[i] for i in seed_string])
+    sample = ''.join([idx_to_char[i] for i in sample])
+    print(sample)
