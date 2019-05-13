@@ -26,7 +26,7 @@ def predict_char(model, seed_index):
     out = torch.nn.functional.softmax(out, dim=2)
     out = out.data.numpy()
     pred = out.reshape(model.vocab_size)
-    pred_index = np.argmax(pred)
+    pred_index = np.random.choice(range(model.vocab_size), p=pred)
     return pred_index
 
 
