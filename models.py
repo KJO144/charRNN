@@ -1,12 +1,15 @@
 import torch
-
+import numpy as np
+from functions import make_one_hot
 
 class MyLSTM(torch.nn.Module):
-    def __init__(self, vocab_size, hidden_size):
+    def __init__(self, vocab_size, hidden_size, char_to_idx, idx_to_char):
         super(MyLSTM, self).__init__()
 
         self.hidden_size = hidden_size
         self.vocab_size = vocab_size
+        self.char_to_idx = char_to_idx
+        self.idx_to_char = idx_to_char
 
         # create recurrent and linear layers
         lstm = torch.nn.LSTM(input_size=self.vocab_size, hidden_size=self.hidden_size)
@@ -40,3 +43,29 @@ class MyLSTM(torch.nn.Module):
     def reset_states(self):
         self.h_prev = torch.zeros([1, 1, self.hidden_size])
         self.c_prev = torch.zeros([1, 1, self.hidden_size])
+
+    def predict_char(self, seed_index):
+        vocab_size = self.vocab_size
+        one_hot_vector = make_one_hot([seed_index], vocab_size)
+        inputs = one_hot_vector.reshape((1, 1, vocab_size))
+        inputs = torch.tensor(inputs, dtype=torch.float)
+        out = self(inputs)
+        out = torch.nn.functional.softmax(out, dim=2)
+        out = out.data.numpy()
+        pred = out.reshape(vocab_size)
+        pred_index = np.random.choice(range(vocab_size), p=pred)
+        return pred_index
+
+    def generate_sample(self, seed_string, size):
+        self.reset_states()
+        seed_string = [self.char_to_idx[i] for i in seed_string]
+        sample = []
+        for i in seed_string:
+            index = self.predict_char(i)
+        sample.append(index)
+
+        for i in range(size - 1):
+            index = self.predict_char(index)
+            sample.append(index)
+        ret = ''.join([self.idx_to_char[i] for i in sample])
+        return ret

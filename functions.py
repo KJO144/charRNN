@@ -18,29 +18,6 @@ def make_one_hot(data, vocab_size):
     return one_hot
 
 
-def predict_char(model, seed_index):
-    one_hot_vector = make_one_hot([seed_index], model.vocab_size)
-    inputs = one_hot_vector.reshape((1, 1, model.vocab_size))
-    inputs = torch.tensor(inputs, dtype=torch.float)
-    out = model(inputs)
-    out = torch.nn.functional.softmax(out, dim=2)
-    out = out.data.numpy()
-    pred = out.reshape(model.vocab_size)
-    pred_index = np.random.choice(range(model.vocab_size), p=pred)
-    return pred_index
-
-
-def generate_sample(model, size, seed_string):
-    model.reset_states()
-    sample = []
-    for i in seed_string:
-        index = predict_char(model, i)
-    sample.append(index)
-
-    for i in range(size - 1):
-        index = predict_char(model, index)
-        sample.append(index)
-    return sample
 
 
 def train(model, optimizer, loss_fn, num_epochs, data, seq_length, verbose=False):
@@ -48,13 +25,17 @@ def train(model, optimizer, loss_fn, num_epochs, data, seq_length, verbose=False
     dtype = torch.float
     data_length = len(data)
     seqs_per_epoch = int(data_length / seq_length)  # will this work if data/seq divides exactly?
-
+    f = open("output.txt", "w+")
     data3d = np.expand_dims(data_one_hot, 1)
     for epoch in range(num_epochs):
         model.reset_states()
 
         if epoch != 0:
-            print('epoch: {}, loss: {}'.format(epoch, loss))
+            info = 'epoch: {}, loss: {}'.format(epoch, loss)
+            print(info)
+            sample = model.generate_sample('a', 100)
+            f.write(info + "\n\n")
+            f.write(sample + "\n\n")
 
         for i in range(seqs_per_epoch):
             start = i * seq_length
@@ -80,7 +61,4 @@ def train(model, optimizer, loss_fn, num_epochs, data, seq_length, verbose=False
                 print(i, loss.item())
 
 
-def print_sample(model, seed_string, length, char_to_idx, idx_to_char):
-    sample = generate_sample(model, length, [char_to_idx[i] for i in seed_string])
-    sample = ''.join([idx_to_char[i] for i in sample])
-    print(sample)
+
