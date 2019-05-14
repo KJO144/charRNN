@@ -36,6 +36,7 @@ def train(model, optimizer, loss_fn, num_epochs, data, seq_length, verbose=False
             sample = model.generate_sample('a', 100)
             f.write(info + "\n\n")
             f.write(sample + "\n\n")
+            f.flush()
 
         for i in range(seqs_per_epoch):
             start = i * seq_length
