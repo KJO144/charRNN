@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 
+
 def data_from_text(data_raw):
     chars = list(set(data_raw))
     chars.sort()
@@ -18,8 +19,6 @@ def make_one_hot(data, vocab_size):
     return one_hot
 
 
-
-
 def train(model, optimizer, loss_fn, num_epochs, data, seq_length, verbose=False):
     data_one_hot = make_one_hot(data, model.vocab_size)
     dtype = torch.float
@@ -27,6 +26,11 @@ def train(model, optimizer, loss_fn, num_epochs, data, seq_length, verbose=False
     seqs_per_epoch = int(data_length / seq_length)  # will this work if data/seq divides exactly?
     f = open("output.txt", "w+")
     data3d = np.expand_dims(data_one_hot, 1)
+
+    if model.use_gpu:
+        print('Using GPU')
+        model.cuda()
+
     for epoch in range(num_epochs):
         model.reset_states()
 
@@ -50,6 +54,9 @@ def train(model, optimizer, loss_fn, num_epochs, data, seq_length, verbose=False
             inputs = torch.tensor(inputs_raw, dtype=dtype)
             targets = torch.tensor(targets_raw, dtype=torch.long)
 
+            if model.use_gpu:
+                inputs, targets = inputs.cuda(), targets.cuda()
+
             out = model(inputs)
 
             out2 = out.view((seq_length, model.vocab_size))
@@ -60,6 +67,3 @@ def train(model, optimizer, loss_fn, num_epochs, data, seq_length, verbose=False
             optimizer.step()
             if verbose and i % 10 == 0:
                 print(i, loss.item())
-
-
-
