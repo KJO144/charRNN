@@ -40,7 +40,6 @@ def train(model, optimizer, loss_fn, num_epochs, data, seq_length, verbose=False
     data3d = np.expand_dims(data_one_hot, 1)
 
     if model.use_gpu:
-        print('Using GPU')
         model.cuda()
 
     for epoch in range(num_epochs):
