@@ -17,7 +17,6 @@ class MyLSTM(torch.nn.Module):
         lstm = torch.nn.LSTM(input_size=self.vocab_size, hidden_size=self.hidden_size)
         linear = torch.nn.Linear(self.hidden_size, self.vocab_size)
 
-        # self.rnn = rnn
         self.lstm = lstm
         self.linear = linear
         self.reset_states()

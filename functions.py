@@ -3,6 +3,10 @@ import torch
 
 
 def data_from_text(data_raw):
+    """Convert a string to a list of integers.
+
+    Also returns the char<->integer mapping dicts.
+    """
     chars = list(set(data_raw))
     chars.sort()
 
@@ -15,11 +19,19 @@ def data_from_text(data_raw):
 
 
 def make_one_hot(data, vocab_size):
+    """Convert list of integers into 2d numpy array.
+
+    The returned array has dimensions (list_length, vocab_size)
+    """
     one_hot = np.eye(vocab_size)[data]
     return one_hot
 
 
 def train(model, optimizer, loss_fn, num_epochs, data, seq_length, verbose=False):
+    """Train the model.
+
+    Data should be a list of integers.
+    """
     data_one_hot = make_one_hot(data, model.vocab_size)
     dtype = torch.float
     data_length = len(data)
