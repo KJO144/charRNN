@@ -4,7 +4,7 @@ from functions import make_one_hot
 
 
 class MyLSTM(torch.nn.Module):
-    def __init__(self, vocab_size, hidden_size, char_to_idx, idx_to_char, use_gpu):
+    def __init__(self, vocab_size, hidden_size, num_layers, char_to_idx, idx_to_char, use_gpu):
         super(MyLSTM, self).__init__()
 
         self.hidden_size = hidden_size
@@ -12,9 +12,10 @@ class MyLSTM(torch.nn.Module):
         self.char_to_idx = char_to_idx
         self.idx_to_char = idx_to_char
         self.use_gpu = use_gpu
+        self.num_layers = num_layers
 
         # create recurrent and linear layers
-        lstm = torch.nn.LSTM(input_size=self.vocab_size, hidden_size=self.hidden_size)
+        lstm = torch.nn.LSTM(input_size=self.vocab_size, hidden_size=self.hidden_size, num_layers=self.num_layers)
         linear = torch.nn.Linear(self.hidden_size, self.vocab_size)
 
         self.lstm = lstm
@@ -42,8 +43,8 @@ class MyLSTM(torch.nn.Module):
         return out
 
     def reset_states(self):
-        self.h_prev = torch.zeros([1, 1, self.hidden_size])
-        self.c_prev = torch.zeros([1, 1, self.hidden_size])
+        self.h_prev = torch.zeros([self.num_layers, 1, self.hidden_size])
+        self.c_prev = torch.zeros([self.num_layers, 1, self.hidden_size])
         if self.use_gpu:
             self.h_prev, self.c_prev = self.h_prev.cuda(), self.c_prev.cuda()
 

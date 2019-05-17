@@ -48,7 +48,7 @@ def train(model, optimizer, loss_fn, num_epochs, data, seq_length, verbose=False
         if epoch != 0:
             info = 'epoch: {}, loss: {}'.format(epoch, loss)
             print(info)
-            sample = model.generate_sample('a', 100)
+            sample = model.generate_sample('a', 200)
             f.write(info + "\n\n")
             f.write(sample + "\n\n")
             f.flush()

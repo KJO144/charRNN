@@ -13,8 +13,9 @@ data_raw = data_raw.translate(table)
 
 data, vocab_size, idx_to_char, char_to_idx = data_from_text(data_raw)
 
-seq_length = 250  # this is how much of the data we sample before updating the params
-hidden_size = 100  # size of the hidden state vector
+seq_length = len(data) // 100
+hidden_size = 200
+num_layers = 1
 learning_rate = 0.001
 num_epochs = 50
 saved_model_file = 'model.pt'
@@ -23,13 +24,13 @@ use_gpu = torch.cuda.is_available()
 if use_gpu:
     print('Using gpu: {}'.format(torch.cuda.get_device_name()))
 
-model = MyLSTM(vocab_size, hidden_size, char_to_idx, idx_to_char, use_gpu)
+model = MyLSTM(vocab_size, hidden_size, num_layers, char_to_idx, idx_to_char, use_gpu)
 
 if isfile(saved_model_file):
     model.load_state_dict(torch.load(saved_model_file))
     print('Loading existing model: {}'.format(saved_model_file))
 
-loss_fn = torch.nn.CrossEntropyLoss(reduction='sum')
+loss_fn = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 t_start = time.time()
