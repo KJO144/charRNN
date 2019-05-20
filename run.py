@@ -4,8 +4,8 @@ from models import *
 import time
 from os.path import isfile
 
-filename = 'input.txt'
-#filename = 'wodehouse_right_ho_jeeves.txt'
+# filename = 'input.txt'
+filename = 'wodehouse_right_ho_jeeves.txt'
 data_raw = open(filename, 'r').read()  # should be simple plain text file
 
 table = str.maketrans(dict.fromkeys('ï»¿_\xa0¡§¨©ªÃ´'))
@@ -15,7 +15,7 @@ data, vocab_size, idx_to_char, char_to_idx = data_from_text(data_raw)
 
 seq_length = len(data) // 100
 hidden_size = 200
-num_layers = 1
+num_layers = 2
 learning_rate = 0.001
 num_epochs = 50
 saved_model_file = 'model.pt'
@@ -41,5 +41,3 @@ torch.save(model.state_dict(), saved_model_file)
 
 sample = model.generate_sample('m', 1000)
 print(sample)
-
-print('\n\nelapsed time: {:2}s'.format(t_end-t_start))

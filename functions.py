@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import time
 
 
 def data_from_text(data_raw):
@@ -43,10 +44,11 @@ def train(model, optimizer, loss_fn, num_epochs, data, seq_length, verbose=False
         model.cuda()
 
     for epoch in range(num_epochs):
+        t_start = time.time()
         model.reset_states()
 
         if epoch != 0:
-            info = 'epoch: {}, loss: {}'.format(epoch, loss)
+            info = 'epoch: {}, loss: {}. Took {:.2f}s'.format(epoch, loss, time_taken)
             print(info)
             sample = model.generate_sample('a', 200)
             f.write(info + "\n\n")
@@ -78,3 +80,5 @@ def train(model, optimizer, loss_fn, num_epochs, data, seq_length, verbose=False
             optimizer.step()
             if verbose and i % 10 == 0:
                 print(i, loss.item())
+        t_end = time.time()
+        time_taken = t_end - t_start
