@@ -8,9 +8,6 @@ from os.path import isfile
 filename = 'wodehouse_right_ho_jeeves.txt'
 data_raw = open(filename, 'r').read()  # should be simple plain text file
 
-table = str.maketrans(dict.fromkeys('ï»¿_\xa0¡§¨©ªÃ´'))
-data_raw = data_raw.translate(table)
-
 data, vocab_size, idx_to_char, char_to_idx = data_from_text(data_raw)
 
 seq_length = len(data) // 100

@@ -1,16 +1,24 @@
 import numpy as np
 import torch
 import time
+import string
 
 
 def data_from_text(data_raw):
     """Convert a string to a list of integers.
 
+    Removes unprintable characters.
     Also returns the char<->integer mapping dicts.
     """
+
+    chars_all = set(data_raw)
+    to_remove = chars_all.difference(string.printable)
+
+    table = str.maketrans(dict.fromkeys(to_remove))
+    data_raw = data_raw.translate(table)
+
     chars = list(set(data_raw))
     chars.sort()
-
     vocab_size = len(chars)
     print('Data has length {} and consist of {} unique characters.'.format(len(data_raw), vocab_size))
     ch_to_idx = {ch: i for i, ch in enumerate(chars)}
